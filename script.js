@@ -3,6 +3,7 @@ let health = 100;
 let gold = 50;
 let currentWeapon = 0;
 let fighting;
+let monsterName;
 let monsterHealth;
 let inventory = ["stick"];
 
@@ -38,7 +39,7 @@ const weapons = [
     {
         name: "sword",
         power: 100
-    },
+    }
 ]
 const monsters = [
     {
@@ -76,8 +77,13 @@ const locations = [
         "button functions": [fightSlime, fightBeast, goTown],
         text: "You enter the cave."
     },
+    {
+        name: "fight",
+        "button text": ["Attack", "Dodge", "Run"],
+        "button functions": [attack, dodge, goTown],
+        text: "Battle commence!"
+    }
 ]
-
 function update(location) {
     button1.innerText = location["button text"][0];
     button2.innerText = location["button text"][1];
@@ -88,6 +94,7 @@ function update(location) {
     text.innerText = location.text;
 }
 function goTown() {
+    monsterStats.style.display = "none";
     update(locations[0]);
 }
 function goStore() {
@@ -102,6 +109,7 @@ function buyHealth() {
         health += 10;
         goldText.innerText = gold;
         healthText.innerText = health;
+        text.innerText = "You bought 10 health.";
     }
     else {
         text.innerText = "You do not have enough gold to buy health.";
@@ -130,8 +138,7 @@ function buyWeapon() {
 }
 sellWeapon()
 {
-    if (inventory.length > 1)
-    {
+    if (inventory.length > 1) {
         gold += 15;
         gold.innerText = gold;
         let currentWeapon = inventory.shift();
@@ -142,12 +149,58 @@ sellWeapon()
         text.innerText = "Don't sell your only weapon!";
     }
 }
+function attack() {
+    text.innerText = "You attack the " + monsterName + " with your " + weapons[currentWeapon].name + "!";
+    let damageDelt = weapons[currentWeapon].power + Math.floor(Math.random() * xp) + 1;
+    if (monsterHealth - damageDelt < 0) {
+        monsterHealth = 0;
+    }
+    else {
+        monsterHealth -= damageDelt;
+    }
+    text.innerText = " You delt " + damageDelt + " damage!";
+    health -= monsters[fighting].level;
+    healthText.innerText = health;
+    monsterHealthText.innerText = monsterHealth;
+    if (health <= 0) {
+        lose();
+    }
+    else if (monsterHealth <= 0) {
+        defeatMonster();
+    }
+}
+function dodge() {
+    text.innerText = "You dodged the attack from the " + monsterName + "!";
+}
 function fightSlime() {
-
+    fighting = 0;
+    goFight();
 }
 function fightBeast() {
-
+    fighting = 1;
+    goFight();
 }
 function fightDragon() {
+    fighting = 2;
+    goFight();
+}
+function goFight() {
+    update(locations[3]);
+    monsterHealth = monsters[fighting].health;
+    monsterName = monsters[fighting].name;
+    text.innerText = "The " + monsterName + " attacks!";
+    monsterStats.style.display = "block";
+    monsterNameText.innerText = monsterName;
+    monsterHealthText.innerText = monsterHealth;
+}
+function lose() {
 
+}
+function defeatMonster() {
+    text.innerText = "The " + monsterName + " was defeated!";
+    gold += Math.floor(monsters[fighting].level * 6.7);
+    xp += monsters[fighting].level;
+    goldText.innerText = gold;
+    xpText.innerText = xp;
+    update(locations[4]);
 }
