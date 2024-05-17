@@ -82,9 +82,22 @@ const locations = [
         "button text": ["Attack", "Dodge", "Run"],
         "button functions": [attack, dodge, goTown],
         text: "Battle commence!"
-    }
+    },
+    {
+        name: "killedMonster",
+        "button text": ["Go to town square", "Go to town square", "Go to town square"],
+        "button functions": [goTown, goTown, goTown],
+        text: "The monster screams \"ARGHH\" as it dies."
+    },
+    {
+        name: "defeat",
+        "button text": ["Restart", "Restart", "Restart"],
+        "button functions": [restart, restart, restart],
+        text: "Defeat..."
+    },
 ]
 function update(location) {
+    monsterStats.style.display = "none";
     button1.innerText = location["button text"][0];
     button2.innerText = location["button text"][1];
     button3.innerText = location["button text"][2];
@@ -94,7 +107,6 @@ function update(location) {
     text.innerText = location.text;
 }
 function goTown() {
-    monsterStats.style.display = "none";
     update(locations[0]);
 }
 function goStore() {
@@ -159,14 +171,20 @@ function attack() {
         monsterHealth -= damageDelt;
     }
     text.innerText = " You delt " + damageDelt + " damage!";
-    health -= monsters[fighting].level;
+    let damageTaken = monsters[fighting].level;
+    if (health - damageTaken < 0) {
+        health = 0;
+    }
+    else {
+        health -= damageTaken;
+    }
     healthText.innerText = health;
     monsterHealthText.innerText = monsterHealth;
-    if (health <= 0) {
-        lose();
-    }
-    else if (monsterHealth <= 0) {
+    if (monsterHealth <= 0) {
         defeatMonster();
+    }
+    else if (health <= 0) {
+        lose();
     }
 }
 function dodge() {
@@ -194,7 +212,18 @@ function goFight() {
     monsterHealthText.innerText = monsterHealth;
 }
 function lose() {
-
+    update(locations[5]);
+}
+function restart() {
+    let xp = 0;
+    let health = 100;
+    let gold = 50;
+    let currentWeapon = 0;
+    let fighting;
+    let monsterName;
+    let monsterHealth;
+    let inventory = ["stick"];
+    goTown();
 }
 function defeatMonster() {
     text.innerText = "The " + monsterName + " was defeated!";
